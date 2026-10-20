@@ -549,23 +549,23 @@
         const cloudLevel = parseInt(match[1], 10);
         const phen = match[2];
 
-        if (['85', '86', '90'].includes(phen)) return 'thunderstorm';
-        if (['76', '80', '83', '84'].includes(phen)) return 'heavy rain';
-        if (['68', '70', '71', '73'].includes(phen)) return 'rain';
-        if (['60', '61', '63', '66'].includes(phen)) return 'light rain';
-        if (['45', '49', '50'].includes(phen)) return 'fog';
+        if (['85', '86', '90'].includes(phen)) return 'Burza z piorunami';
+        if (['76', '80', '83', '84'].includes(phen)) return 'Ulewa';
+        if (['68', '70', '71', '73'].includes(phen)) return 'Deszcz';
+        if (['60', '61', '63', '66'].includes(phen)) return 'Lekki deszcz';
+        if (['45', '49', '50'].includes(phen)) return 'Mgła';
 
-        if (['08', '09', '10'].includes(phen) || cloudLevel >= 8) return 'overcast';
-        if (['06', '07'].includes(phen) || (cloudLevel >= 3 && cloudLevel <= 7)) return 'scattered clouds';
-        if (['04', '05'].includes(phen) || cloudLevel === 1 || cloudLevel === 2) return 'partly cloudy';
+        if (['08', '09', '10'].includes(phen) || cloudLevel >= 8) return 'Pochmurno';
+        if (['06', '07'].includes(phen) || (cloudLevel >= 3 && cloudLevel <= 7)) return 'Rozproszone chmury';
+        if (['04', '05'].includes(phen) || cloudLevel === 1 || cloudLevel === 2) return 'Częściowe zachmurzenie';
         if (cloudLevel === 0) return 'clear sky';
       }
 
       const c = parseInt(cloudP || '0', 10);
-      if (c < 20) return 'clear sky';
-      if (c < 50) return 'few clouds';
-      if (c < 80) return 'scattered clouds';
-      return 'overcast';
+      if (c < 20) return 'Bezchmurne niebo';
+      if (c < 50) return 'Niewielkie zachmurzenie';
+      if (c < 80) return 'Rozproszone chmury';
+      return 'Pochmurno';
     }
 
     // Weather Fetching
@@ -651,7 +651,7 @@
         if (dayIdx < uniqueDays.length) {
           const dayData = uniqueDays[dayIdx];
           const dateObj = new Date(dayData.Date);
-          const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+          const dayName = dateObj.toLocaleDateString('pl-PL', { weekday: 'short' }).toUpperCase();
           const minC = Math.round(parseFloat(dayData.Temp_Min) - 273.15);
           const maxC = Math.round(parseFloat(dayData.Temp_Max) - 273.15);
 
