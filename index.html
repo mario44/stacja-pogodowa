@@ -88,26 +88,33 @@
       background-color: #444444;
       width: 100%;
     }
+    /* Seamless Infinite Marquee without gaps */
     .weather-desc-container {
       width: 100%;
       overflow: hidden;
       white-space: nowrap;
       position: relative;
     }
-    .weather-desc {
+    .weather-desc-track {
       display: inline-block;
       white-space: nowrap;
-      padding-left: 100%;
-      animation: marquee 18s linear infinite;
+      animation: marquee-continuous 22s linear infinite;
+      will-change: transform;
+    }
+    @keyframes marquee-continuous {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+    .weather-desc-text {
       font-size: 24px;
       font-weight: 600;
       color: #ffffff;
       text-transform: capitalize;
-      will-change: transform;
     }
-    @keyframes marquee {
-      0% { transform: translate3d(0, 0, 0); }
-      100% { transform: translate3d(-100%, 0, 0); }
+    .weather-desc-spacer {
+      font-size: 24px;
+      font-weight: 600;
+      color: #80D8FF;
     }
     .main-weather-row {
       display: flex;
@@ -332,9 +339,14 @@
 
     <div class="divider"></div>
 
-    <!-- Weather Description & Name Days -->
+    <!-- Weather Description & Name Days (Seamless Infinite Loop) -->
     <div class="weather-desc-container">
-      <div class="weather-desc" id="tvWeatherDesc">Bezchmurnie</div>
+      <div class="weather-desc-track">
+        <span class="weather-desc-text" id="tvWeatherDesc1">Bezchmurnie</span>
+        <span class="weather-desc-spacer">&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span class="weather-desc-text" id="tvWeatherDesc2">Bezchmurnie</span>
+        <span class="weather-desc-spacer">&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      </div>
     </div>
 
     <!-- Main Weather Row -->
@@ -612,7 +624,8 @@
         fullText += `  •  Imieniny: ${cleanNames}`;
       }
 
-      document.getElementById('tvWeatherDesc').innerText = fullText;
+      document.getElementById('tvWeatherDesc1').innerText = fullText;
+      document.getElementById('tvWeatherDesc2').innerText = fullText;
     }
 
     // Weather Fetching
