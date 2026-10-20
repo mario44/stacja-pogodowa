@@ -88,12 +88,20 @@
       background-color: #444444;
       width: 100%;
     }
+    .weather-desc-container {
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+    }
     .weather-desc {
       text-align: center;
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 600;
       color: #ffffff;
       text-transform: capitalize;
+      display: inline-block;
+      white-space: nowrap;
     }
     .main-weather-row {
       display: flex;
@@ -318,8 +326,10 @@
 
     <div class="divider"></div>
 
-    <!-- Weather Description -->
-    <div class="weather-desc" id="tvWeatherDesc">clear sky</div>
+    <!-- Weather Description & Name Days -->
+    <div class="weather-desc-container">
+      <div class="weather-desc" id="tvWeatherDesc">Clear sky</div>
+    </div>
 
     <!-- Main Weather Row -->
     <div class="main-weather-row">
@@ -420,6 +430,19 @@
     let currentLat = localStorage.getItem('selected_lat') || '53.40416667';
     let currentLon = localStorage.getItem('selected_lon') || '14.52361111';
     let currentName = localStorage.getItem('selected_name') || 'Szczecin';
+    let imieninyMap = {};
+
+    // Fetch Imieniny
+    async function fetchImieniny() {
+      try {
+        const res = await fetch('https://raw.githubusercontent.com/mario44/stacja-pogodowa/refs/heads/main/imieniny.json');
+        imieninyMap = await res.json();
+        updateWeatherDescText();
+      } catch (e) {
+        console.error("Imieniny fetch error:", e);
+      }
+    }
+    fetchImieniny();
 
     // Clock Ticker (runs every 1 sec)
     function updateClock() {
@@ -549,23 +572,41 @@
         const cloudLevel = parseInt(match[1], 10);
         const phen = match[2];
 
-        if (['85', '86', '90'].includes(phen)) return 'Burza z piorunami';
-        if (['76', '80', '83', '84'].includes(phen)) return 'Ulewa';
-        if (['68', '70', '71', '73'].includes(phen)) return 'Deszcz';
-        if (['60', '61', '63', '66'].includes(phen)) return 'Lekki deszcz';
-        if (['45', '49', '50'].includes(phen)) return 'Mgła';
+        if (['85', '86', '90'].includes(phen)) return 'thunderstorm';
+        if (['76', '80', '83', '84'].includes(phen)) return 'heavy rain';
+        if (['68', '70', '71', '73'].includes(phen)) return 'rain';
+        if (['60', '61', '63', '66'].includes(phen)) return 'light rain';
+        if (['45', '49', '50'].includes(phen)) return 'fog';
 
-        if (['08', '09', '10'].includes(phen) || cloudLevel >= 8) return 'Pochmurno';
-        if (['06', '07'].includes(phen) || (cloudLevel >= 3 && cloudLevel <= 7)) return 'Rozproszone chmury';
-        if (['04', '05'].includes(phen) || cloudLevel === 1 || cloudLevel === 2) return 'Częściowe zachmurzenie';
+        if (['08', '09', '10'].includes(phen) || cloudLevel >= 8) return 'overcast';
+        if (['06', '07'].includes(phen) || (cloudLevel >= 3 && cloudLevel <= 7)) return 'scattered clouds';
+        if (['04', '05'].includes(phen) || cloudLevel === 1 || cloudLevel === 2) return 'partly cloudy';
         if (cloudLevel === 0) return 'clear sky';
       }
 
       const c = parseInt(cloudP || '0', 10);
-      if (c < 20) return 'Bezchmurne niebo';
-      if (c < 50) return 'Niewielkie zachmurzenie';
-      if (c < 80) return 'Rozproszone chmury';
-      return 'Pochmurno';
+      if (c < 20) return 'clear sky';
+      if (c < 50) return 'few clouds';
+      if (c < 80) return 'scattered clouds';
+      return 'overcast';
+    }
+
+    function updateWeatherDescText() {
+      const now = new Date();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      const key = `${m}-${d}`;
+
+      const rawNames = imieninyMap[key] || '';
+      const cleanNames = rawNames.replace(/[\r\n]+/g, '').trim();
+
+      const baseDesc = window.currentWeatherDescText || 'Clear sky';
+      let fullText = baseDesc;
+      if (cleanNames) {
+        fullText += `  •  Imieniny: ${cleanNames}`;
+      }
+
+      document.getElementById('tvWeatherDesc').innerText = fullText;
     }
 
     // Weather Fetching
@@ -628,7 +669,9 @@
         // Update Weather Icon & Description
         const iconCode = currentItem.Icon || currentItem.Icon10;
         document.getElementById('ivMainWeatherIcon').innerHTML = getWeatherSvg(iconCode, currentItem.Cloud);
-        document.getElementById('tvWeatherDesc').innerText = getWeatherDescText(iconCode, currentItem.Cloud);
+
+        window.currentWeatherDescText = getWeatherDescText(iconCode, currentItem.Cloud);
+        updateWeatherDescText();
       }
 
       // Forecast
@@ -651,7 +694,7 @@
         if (dayIdx < uniqueDays.length) {
           const dayData = uniqueDays[dayIdx];
           const dateObj = new Date(dayData.Date);
-          const dayName = dateObj.toLocaleDateString('pl-PL', { weekday: 'short' }).toUpperCase();
+          const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
           const minC = Math.round(parseFloat(dayData.Temp_Min) - 273.15);
           const maxC = Math.round(parseFloat(dayData.Temp_Max) - 273.15);
 
