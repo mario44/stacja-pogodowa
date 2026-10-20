@@ -421,10 +421,10 @@
     function updateClock() {
       const now = new Date();
       document.getElementById('tvCurrentTime').innerText = now.toLocaleTimeString('pl-PL', { hour12: false });
-      
+
       const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
       document.getElementById('tvCurrentDate').innerText = now.toLocaleDateString('pl-PL', options);
-      
+
       updateMoonPhase(now);
     }
     setInterval(updateClock, 1000);
@@ -513,7 +513,7 @@
 
     function updateUI(hybrid, gfs) {
       const hourlyList = (hybrid && hybrid.Data) ? hybrid.Data : ((gfs && gfs.Data) ? gfs.Data : []);
-      
+
       // Select valid current item
       const nowMs = Date.now();
       const validItems = hourlyList.filter(item => parseFloat(item.Temperature || 0) > 200.0);
@@ -533,12 +533,12 @@
         const tempC = (parseFloat(currentItem.Temperature) - 273.15).toFixed(1);
         document.getElementById('tvTemperature').innerText = `${tempC}°`;
         document.getElementById('tvHumidity').innerText = `${currentItem.Humidity || '--'}%`;
-        
+
         const pres = Math.round(parseFloat(currentItem.PressureMSL || currentItem.Pressure || 0) / (parseFloat(currentItem.Pressure || 0) > 2000 ? 100 : 1));
         document.getElementById('tvPressure').innerText = `${pres || '--'} hPa`;
-        
+
         document.getElementById('tvWindSpeed').innerText = `${Math.round(parseFloat(currentItem.Wind_Speed || 0))} m/s`;
-        
+
         const windDeg = parseFloat(currentItem.Wind_Dir || 0);
         document.getElementById('ivWindIcon').style.transform = `rotate(${windDeg}deg)`;
 
@@ -658,5 +658,3 @@
   </script>
 </body>
 </html>
-}
-}}
