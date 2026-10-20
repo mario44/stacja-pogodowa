@@ -372,14 +372,14 @@
       <div class="sun-item">
         <div class="sun-title">▲ SUNRISE</div>
         <div class="sun-icon">
-          <svg viewBox="0 0 32 32"><path d="M16 8l-4 4h8z" fill="#FFFFFF"/><path d="M6 22h20v2H6z" fill="#80D8FF"/><circle cx="16" cy="20" r="6" fill="#FFBE3C"/></svg>
+          <svg viewBox="0 0 32 32"><path d="M16 6l-4 4h8z" fill="#FFFFFF"/><path d="M6 22h20v2H6z" fill="#80D8FF"/><circle cx="16" cy="18" r="6" fill="#FFBE3C"/></svg>
         </div>
         <div class="sun-time" id="tvSunriseTime">07:28</div>
       </div>
       <div class="sun-item">
         <div class="sun-title">SUNSET ▼</div>
         <div class="sun-icon">
-          <svg viewBox="0 0 32 32"><path d="M16 16l-4-4h8z" fill="#FFFFFF"/><path d="M6 22h20v2H6z" fill="#80D8FF"/><circle cx="16" cy="18" r="6" fill="#FFBE3C"/></svg>
+          <svg viewBox="0 0 32 32"><path d="M16 28l-4-4h8z" fill="#FFFFFF"/><path d="M6 18h20v2H6z" fill="#80D8FF"/><circle cx="16" cy="20" r="6" fill="#FFBE3C"/></svg>
         </div>
         <div class="sun-time" id="tvSunsetTime">18:07</div>
       </div>
@@ -417,7 +417,7 @@
     let currentLon = localStorage.getItem('selected_lon') || '14.52361111';
     let currentName = localStorage.getItem('selected_name') || 'Szczecin';
 
-    // Clock Ticker
+    // Clock Ticker (runs every 1 sec)
     function updateClock() {
       const now = new Date();
       document.getElementById('tvCurrentTime').innerText = now.toLocaleTimeString('pl-PL', { hour12: false });
@@ -643,8 +643,9 @@
       }
 
       for (let i = 1; i <= 4; i++) {
-        if (i < uniqueDays.length) {
-          const dayData = uniqueDays[i];
+        const dayIdx = i - 1;
+        if (dayIdx < uniqueDays.length) {
+          const dayData = uniqueDays[dayIdx];
           const dateObj = new Date(dayData.Date);
           const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
           const minC = Math.round(parseFloat(dayData.Temp_Min) - 273.15);
@@ -664,7 +665,7 @@
       }
     }
 
-    // Refresh weather every 10 mins
+    // Refresh weather every 10 mins automatically
     setInterval(fetchWeather, 10 * 60 * 1000);
     fetchWeather();
 
