@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Stacja Pogodowa">
+  <title>Stacja Pogodowa</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .header {
+      text-align: center;
+    }
+    .location-name {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .current-date {
+      font-size: 18px;
+      color: #80D8FF;
+      margin-top: 6px;
+      text-transform: capitalize;
+    }
+    .clock-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 4px;
+    }
+    .clock-time {
+      font-size: 48px;
+      font-weight: 800;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+    }
+    .btn-search {
+      background-color: #3A3A3C;
+      border: none;
+      border-radius: 12px;
+      width: 46px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .btn-search svg {
+      width: 24px;
+      height: 24px;
+      fill: #00E5FF;
+    }
+    .divider {
+      height: 1.5px;
+      background-color: #444444;
+      width: 100%;
+    }
+    .weather-desc {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 600;
+      color: #ffffff;
+      text-transform: lowercase;
+    }
+    .main-weather-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .weather-icon-col {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+    .weather-icon-col svg, .weather-icon-col img {
+      width: 90px;
+      height: 90px;
+    }
+    .stats-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .temp-text {
+      font-size: 44px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+    .sub-stat {
+      font-size: 18px;
+      font-weight: 700;
+      color: #80D8FF;
+    }
+    .wind-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .wind-icon {
+      width: 54px;
+      height: 54px;
+      transition: transform 0.5s ease;
+    }
+    .wind-speed {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 6px;
+      color: #ffffff;
+    }
+    .forecast-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+    .forecast-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .forecast-day {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .forecast-temp {
+      font-size: 16px;
+      font-weight: 700;
+      color: #80D8FF;
+      margin-top: 2px;
+    }
+    .forecast-icon {
+      width: 46px;
+      height: 46px;
+      margin-top: 6px;
+    }
+    .sun-row {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      text-align: center;
+    }
+    .sun-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .sun-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sun-time {
+      font-size: 22px;
+      font-weight: 800;
+      color: #80D8FF;
+      margin-top: 4px;
+    }
+    .sun-icon {
+      width: 44px;
+      height: 34px;
+      margin-top: 4px;
+    }
+    .moon-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+    }
+    .moon-icon {
+      width: 54px;
+      height: 54px;
+    }
+    .moon-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .moon-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .moon-details {
+      font-size: 14px;
+      color: #80D8FF;
+      margin-top: 2px;
+    }
+    /* Modal Search */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #000000;
+      z-index: 1000;
+      padding: 20px;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-back {
+      background-color: #3A3A3C;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #ffffff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .search-input-group {
+      display: flex;
+      gap: 8px;
+    }
+    .search-input {
+      flex: 1;
+      height: 48px;
+      background-color: #2C2C2E;
+      border: 1px solid #444444;
+      border-radius: 12px;
+      padding: 0 16px;
+      color: #ffffff;
+      font-size: 16px;
+      outline: none;
+    }
+    .search-results-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+    }
+    .search-item {
+      background-color: #1C1C1E;
+      border: 1px solid #444444;
+      border-radius: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+    }
+    .search-item-title {
+      font-size: 17px;
+      font-weight: 700;
+    }
+    .search-item-sub {
+      font-size: 13px;
+      color: #AAAAAA;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Top Location Header -->
+    <div class="header">
+      <div class="location-name" id="tvLocationName">Szczecin</div>
+      <div class="current-date" id="tvCurrentDate">wtorek, 06.06.2026</div>
+      <div class="clock-row">
+        <div class="clock-time" id="tvCurrentTime">08:03:26</div>
+        <button class="btn-search" id="btnOpenSearch" aria-label="Szukaj">
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Weather Description -->
+    <div class="weather-desc" id="tvWeatherDesc">clear sky</div>
+
+    <!-- Main Weather Row -->
+    <div class="main-weather-row">
+      <div class="weather-icon-col" id="ivMainWeatherIcon">
+        <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="8" fill="#FFBE3C"/></svg>
+      </div>
+      <div class="stats-col">
+        <div class="temp-text" id="tvTemperature">14.3°</div>
+        <div class="sub-stat" id="tvHumidity">76%</div>
+        <div class="sub-stat" id="tvPressure">955 hPa</div>
+      </div>
+      <div class="wind-col">
+        <div class="wind-icon" id="ivWindIcon">
+          <svg viewBox="0 0 24 24" fill="#00E5FF"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+        </div>
+        <div class="wind-speed" id="tvWindSpeed">1 m/s</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 4 Day Forecast Row -->
+    <div class="forecast-row" id="layoutForecast">
+      <div class="forecast-item">
+        <div class="forecast-day" id="tvDay1">WED</div>
+        <div class="forecast-temp" id="tvTemp1">9-22°</div>
+        <div class="forecast-icon" id="ivIcon1"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="8" fill="#FFBE3C"/></svg></div>
+      </div>
+      <div class="forecast-item">
+        <div class="forecast-day" id="tvDay2">THU</div>
+        <div class="forecast-temp" id="tvTemp2">10-24°</div>
+        <div class="forecast-icon" id="ivIcon2"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="8" fill="#FFBE3C"/></svg></div>
+      </div>
+      <div class="forecast-item">
+        <div class="forecast-day" id="tvDay3">FRI</div>
+        <div class="forecast-temp" id="tvTemp3">11-25°</div>
+        <div class="forecast-icon" id="ivIcon3"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="8" fill="#FFBE3C"/></svg></div>
+      </div>
+      <div class="forecast-item">
+        <div class="forecast-day" id="tvDay4">SAT</div>
+        <div class="forecast-temp" id="tvTemp4">13-24°</div>
+        <div class="forecast-icon" id="ivIcon4"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="8" fill="#FFBE3C"/></svg></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Sunrise & Sunset Row -->
+    <div class="sun-row">
+      <div class="sun-item">
+        <div class="sun-title">▲ SUNRISE</div>
+        <div class="sun-icon">
+          <svg viewBox="0 0 32 32"><path d="M16 8l-4 4h8z" fill="#FFFFFF"/><path d="M6 22h20v2H6z" fill="#80D8FF"/><circle cx="16" cy="20" r="6" fill="#FFBE3C"/></svg>
+        </div>
+        <div class="sun-time" id="tvSunriseTime">07:28</div>
+      </div>
+      <div class="sun-item">
+        <div class="sun-title">SUNSET ▼</div>
+        <div class="sun-icon">
+          <svg viewBox="0 0 32 32"><path d="M16 16l-4-4h8z" fill="#FFFFFF"/><path d="M6 22h20v2H6z" fill="#80D8FF"/><circle cx="16" cy="18" r="6" fill="#FFBE3C"/></svg>
+        </div>
+        <div class="sun-time" id="tvSunsetTime">18:07</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Moon Phase Row -->
+    <div class="moon-row">
+      <div class="moon-icon" id="ivMoonIcon">
+        <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#FFFFFF"/></svg>
+      </div>
+      <div class="moon-info">
+        <div class="moon-title" id="tvMoonPhaseTitle">First Quarter</div>
+        <div class="moon-details" id="tvMoonPhaseDetails">Illumination: 31% • Cycle day: 5.6</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div class="modal" id="searchModal">
+    <div class="modal-header">
+      <button class="btn-back" id="btnCloseSearch">← Wróć</button>
+      <h2>Szukaj miejscowości</h2>
+    </div>
+    <div class="search-input-group">
+      <input type="text" class="search-input" id="etSearchQuery" placeholder="Wpisz nazwę (np. Szczecin)...">
+    </div>
+    <ul class="search-results-list" id="rvSearchResults"></ul>
+  </div>
+
+  <script>
+    let currentLat = localStorage.getItem('selected_lat') || '53.40416667';
+    let currentLon = localStorage.getItem('selected_lon') || '14.52361111';
+    let currentName = localStorage.getItem('selected_name') || 'Szczecin';
+
+    // Clock Ticker
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('tvCurrentTime').innerText = now.toLocaleTimeString('pl-PL', { hour12: false });
+
+      const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+      document.getElementById('tvCurrentDate').innerText = now.toLocaleDateString('pl-PL', options);
+
+      updateMoonPhase(now);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Moon Phase Calculator
+    function updateMoonPhase(date) {
+      const year = date.getUTCFullYear();
+      let month = date.getUTCMonth() + 1;
+      const day = date.getUTCDate();
+      const hour = date.getUTCHours();
+      const minute = date.getUTCMinutes();
+
+      let y = year, m = month;
+      if (m <= 2) { y -= 1; m += 12; }
+      const a = Math.floor(y / 100);
+      const b = Math.floor(a / 4);
+      const c = 2 - a + b;
+      const e = Math.floor(365.25 * (y + 4716));
+      const f = Math.floor(30.6001 * (m + 1));
+      const jd = c + day + e + f - 1524.5 + (hour + minute / 60.0) / 24.0;
+
+      const daysSinceNew = jd - 2460320.33;
+      const synodicMonth = 29.530588;
+      let moonAge = daysSinceNew % synodicMonth;
+      if (moonAge < 0) moonAge += synodicMonth;
+
+      const phaseAngle = (moonAge / synodicMonth) * 2.0 * Math.PI;
+      const illumination = Math.round(((1.0 - Math.cos(phaseAngle)) / 2.0) * 100.0);
+
+      let phaseName = "New Moon";
+      let moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#333333" stroke="#FFFFFF" stroke-width="1.5"/></svg>';
+
+      if (moonAge < 1.84 || moonAge >= 27.69) {
+        phaseName = "New Moon";
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222" stroke="#FFFFFF" stroke-width="1.5"/></svg>';
+      } else if (moonAge < 5.53) {
+        phaseName = "Waxing Crescent";
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222"/><path d="M16 4 A12 12 0 0 1 16 28 A8 12 0 0 0 16 4 Z" fill="#FFFFFF"/></svg>';
+      } else if (moonAge < 9.23) {
+        phaseName = "First Quarter";
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222"/><path d="M16 4 A12 12 0 0 1 16 28 Z" fill="#FFFFFF"/></svg>';
+      } else if (moonAge < 12.92) {
+        phaseName = "Waxing Gibbous";
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#FFFFFF"/><path d="M16 4 A8 12 0 0 0 16 28 A12 12 0 0 0 16 4 Z" fill="#222222"/></svg>';
+      } else if (moonAge < 16.61) {
+        phaseName = "Full Moon";
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#FFFFFF"/></svg>';
+      } else if (moonAge < 20.30) {
+        phaseName = "Waning Gibbous";
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#FFFFFF"/><path d="M16 4 A8 12 0 0 1 16 28 A12 12 0 0 1 16 4 Z" fill="#222222"/></svg>';
+      } else if (moonAge < 23.99) {
+        phaseName = "Last Quarter";
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222"/><path d="M16 4 A12 12 0 0 0 16 28 Z" fill="#FFFFFF"/></svg>';
+      } else {
+        phaseName = "Waning Crescent";
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222"/><path d="M16 4 A12 12 0 0 0 16 28 A8 12 0 0 1 16 4 Z" fill="#FFFFFF"/></svg>';
+      }
+
+      document.getElementById('tvMoonPhaseTitle').innerText = phaseName;
+      document.getElementById('tvMoonPhaseDetails').innerText = `Illumination: ${illumination}% • Cycle day: ${moonAge.toFixed(1)}`;
+      document.getElementById('ivMoonIcon').innerHTML = moonSvg;
+    }
+
+    // Weather Fetching
+    async function fetchWeather() {
+      document.getElementById('tvLocationName').innerText = currentName;
+
+      try {
+        const hybridUrl = `https://meteo.imgw.pl/api/v1/forecast/fcapi?token=p4DXKjsYadfBV21TYrDk&lat=${currentLat}&lon=${currentLon}&m=hybrid`;
+        const gfsUrl = `https://fcapi-gfs.imgw.pl/get?lat=${currentLat}&lon=${currentLon}&z=0&m=gfs&lasttime=0&p=mobile`;
+
+        const [hybridRes, gfsRes] = await Promise.allSettled([
+          fetch(hybridUrl).then(r => r.json()),
+          fetch(gfsUrl).then(r => r.json())
+        ]);
+
+        const hybridData = hybridRes.status === 'fulfilled' ? hybridRes.value.data : null;
+        const gfsData = gfsRes.status === 'fulfilled' ? gfsRes.value : null;
+
+        updateUI(hybridData, gfsData);
+      } catch (e) {
+        console.error("Fetch error:", e);
+      }
+    }
+
+    function updateUI(hybrid, gfs) {
+      const hourlyList = (hybrid && hybrid.Data) ? hybrid.Data : ((gfs && gfs.Data) ? gfs.Data : []);
+
+      // Select valid current item
+      const nowMs = Date.now();
+      const validItems = hourlyList.filter(item => parseFloat(item.Temperature || 0) > 200.0);
+      let currentItem = validItems[0];
+      let minDiff = Infinity;
+
+      for (let item of validItems) {
+        const itemMs = new Date(item.Date).getTime();
+        const diff = Math.abs(itemMs - nowMs);
+        if (diff < minDiff) {
+          minDiff = diff;
+          currentItem = item;
+        }
+      }
+
+      if (currentItem) {
+        const tempC = (parseFloat(currentItem.Temperature) - 273.15).toFixed(1);
+        document.getElementById('tvTemperature').innerText = `${tempC}°`;
+        document.getElementById('tvHumidity').innerText = `${currentItem.Humidity || '--'}%`;
+
+        const pres = Math.round(parseFloat(currentItem.PressureMSL || currentItem.Pressure || 0) / (parseFloat(currentItem.Pressure || 0) > 2000 ? 100 : 1));
+        document.getElementById('tvPressure').innerText = `${pres || '--'} hPa`;
+
+        document.getElementById('tvWindSpeed').innerText = `${Math.round(parseFloat(currentItem.Wind_Speed || 0))} m/s`;
+
+        const windDeg = parseFloat(currentItem.Wind_Dir || 0);
+        document.getElementById('ivWindIcon').style.transform = `rotate(${windDeg}deg)`;
+
+        // Description
+        document.getElementById('tvWeatherDesc').innerText = getWeatherDescText(currentItem.Icon || currentItem.Icon10, currentItem.Cloud);
+      }
+
+      // Forecast
+      const hybridDaily = (hybrid && hybrid.Daily_Data) ? hybrid.Daily_Data : [];
+      const gfsDaily = (gfs && gfs.Daily_Data) ? gfs.Daily_Data : [];
+      const combinedDaily = [...hybridDaily, ...gfsDaily];
+
+      const uniqueDays = [];
+      const seenDates = new Set();
+      for (let day of combinedDaily) {
+        const dateKey = day.Date ? day.Date.substring(0, 10) : '';
+        if (dateKey && !seenDates.has(dateKey)) {
+          seenDates.add(dateKey);
+          uniqueDays.push(day);
+        }
+      }
+
+      for (let i = 1; i <= 4; i++) {
+        if (i < uniqueDays.length) {
+          const dayData = uniqueDays[i];
+          const dateObj = new Date(dayData.Date);
+          const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+          const minC = Math.round(parseFloat(dayData.Temp_Min) - 273.15);
+          const maxC = Math.round(parseFloat(dayData.Temp_Max) - 273.15);
+
+          document.getElementById(`tvDay${i}`).innerText = dayName;
+          document.getElementById(`tvTemp${i}`).innerText = `${minC}-${maxC}°`;
+        }
+      }
+
+      // Sun
+      const sun = (hybrid && hybrid.Sun) ? hybrid.Sun : ((gfs && gfs.Sun) ? gfs.Sun : null);
+      if (sun) {
+        if (sun.Sunrise) document.getElementById('tvSunriseTime').innerText = new Date(sun.Sunrise).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+        if (sun.Sunset) document.getElementById('tvSunsetTime').innerText = new Date(sun.Sunset).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+      }
+    }
+
+    function getWeatherDescText(iconName, cloudP) {
+      if (!iconName) return 'clear sky';
+      const code = iconName.toLowerCase();
+      if (code.startsWith('n0z00')) return 'clear sky';
+      if (code.startsWith('n1z00') || code.includes('04') || code.includes('05')) return 'few clouds';
+      if (code.startsWith('n2z00') || code.includes('06') || code.includes('07')) return 'partly cloudy';
+      if (code.startsWith('n5z00') || code.startsWith('n7z00') || code.includes('08')) return 'scattered clouds';
+      if (code.startsWith('n8z00') || code.includes('09') || code.includes('10')) return 'overcast';
+      if (code.includes('45') || code.includes('50')) return 'fog';
+      if (code.includes('60') || code.includes('61')) return 'light rain';
+      if (code.includes('68') || code.includes('70')) return 'rain';
+      if (code.includes('76') || code.includes('80')) return 'heavy rain';
+      if (code.includes('85') || code.includes('90')) return 'thunderstorm';
+      return 'partly cloudy';
+    }
+
+    // Refresh weather every 10 mins
+    setInterval(fetchWeather, 10 * 60 * 1000);
+    fetchWeather();
+
+    // Modal Search Logic
+    const searchModal = document.getElementById('searchModal');
+    const etQuery = document.getElementById('etSearchQuery');
+    const rvResults = document.getElementById('rvSearchResults');
+
+    document.getElementById('btnOpenSearch').onclick = () => {
+      searchModal.classList.add('active');
+      etQuery.focus();
+    };
+    document.getElementById('btnCloseSearch').onclick = () => {
+      searchModal.classList.remove('active');
+    };
+
+    let searchTimeout = null;
+    etQuery.oninput = () => {
+      clearTimeout(searchTimeout);
+      const query = etQuery.value.trim();
+      if (query.length >= 2) {
+        searchTimeout = setTimeout(() => doSearch(query), 400);
+      } else {
+        rvResults.innerHTML = '';
+      }
+    };
+
+    async function doSearch(query) {
+      try {
+        const res = await fetch(`https://meteo.imgw.pl/api/geo/v2/search/${encodeURIComponent(query)}`);
+        const list = await res.json();
+        rvResults.innerHTML = '';
+
+        list.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'search-item';
+          li.innerHTML = `
+            <div class="search-item-title">${item.identifier || item.name}</div>
+            <div class="search-item-sub">woj. ${item.province || ''}, pow. ${item.district || ''}</div>
+          `;
+          li.onclick = () => {
+            currentLat = item.lat;
+            currentLon = item.lon;
+            currentName = item.name || item.identifier;
+
+            localStorage.setItem('selected_lat', currentLat);
+            localStorage.setItem('selected_lon', currentLon);
+            localStorage.setItem('selected_name', currentName);
+
+            searchModal.classList.remove('active');
+            fetchWeather();
+          };
+          rvResults.appendChild(li);
+        });
+      } catch (e) {
+        console.error("Search error:", e);
+      }
+    }
+  </script>
+</body>
+</html>
