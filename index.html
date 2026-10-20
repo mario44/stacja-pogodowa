@@ -88,7 +88,7 @@
       background-color: #444444;
       width: 100%;
     }
-    /* iOS Safari Pixel-Exact Ticker */
+    /* 100% Seamless Continuous Infinite Marquee */
     .weather-desc-container {
       width: 100%;
       overflow: hidden;
@@ -342,7 +342,7 @@
 
     <div class="divider"></div>
 
-    <!-- Weather Description & Name Days (Pixel-Exact JS Ticker) -->
+    <!-- Weather Description & Name Days (4-Block Infinite Marquee) -->
     <div class="weather-desc-container" id="weatherDescContainer">
       <div class="weather-desc-track" id="weatherDescTrack">
         <div class="weather-desc-block" id="weatherDescBlock1">
@@ -351,6 +351,14 @@
         </div>
         <div class="weather-desc-block" id="weatherDescBlock2">
           <span class="weather-desc-text" id="tvWeatherDesc2">Bezchmurnie</span>
+          <span class="weather-desc-spacer">•</span>
+        </div>
+        <div class="weather-desc-block" id="weatherDescBlock3">
+          <span class="weather-desc-text" id="tvWeatherDesc3">Bezchmurnie</span>
+          <span class="weather-desc-spacer">•</span>
+        </div>
+        <div class="weather-desc-block" id="weatherDescBlock4">
+          <span class="weather-desc-text" id="tvWeatherDesc4">Bezchmurnie</span>
           <span class="weather-desc-spacer">•</span>
         </div>
       </div>
@@ -457,7 +465,7 @@
     let currentName = localStorage.getItem('selected_name') || 'Szczecin';
     let imieninyMap = {};
 
-    // Dynamic Pixel-Exact JS Marquee Ticker for 100% Perfect Loop on iOS Safari
+    // Dynamic Pixel-Exact JS Marquee Ticker with 4 Duplicated Blocks
     let marqueePos = 0;
     let marqueeAnim = null;
 
@@ -661,8 +669,9 @@
 
       document.getElementById('tvWeatherDesc1').innerText = fullText;
       document.getElementById('tvWeatherDesc2').innerText = fullText;
+      document.getElementById('tvWeatherDesc3').innerText = fullText;
+      document.getElementById('tvWeatherDesc4').innerText = fullText;
 
-      // Start Pixel-Exact JS Marquee Ticker
       setTimeout(startMarquee, 100);
     }
 
