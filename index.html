@@ -88,7 +88,7 @@
       background-color: #444444;
       width: 100%;
     }
-    /* Seamless Infinite Marquee without gaps */
+    /* 100% Seamless Continuous Infinite Marquee */
     .weather-desc-container {
       width: 100%;
       overflow: hidden;
@@ -96,10 +96,15 @@
       position: relative;
     }
     .weather-desc-track {
-      display: inline-block;
-      white-space: nowrap;
-      animation: marquee-continuous 22s linear infinite;
+      display: flex;
+      width: max-content;
+      animation: marquee-continuous 20s linear infinite;
       will-change: transform;
+    }
+    .weather-desc-block {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
     }
     @keyframes marquee-continuous {
       0% { transform: translate3d(0, 0, 0); }
@@ -342,10 +347,14 @@
     <!-- Weather Description & Name Days (Seamless Infinite Loop) -->
     <div class="weather-desc-container">
       <div class="weather-desc-track">
-        <span class="weather-desc-text" id="tvWeatherDesc1">Bezchmurnie</span>
-        <span class="weather-desc-spacer">&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        <span class="weather-desc-text" id="tvWeatherDesc2">Bezchmurnie</span>
-        <span class="weather-desc-spacer">&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <div class="weather-desc-block">
+          <span class="weather-desc-text" id="tvWeatherDesc1">Bezchmurnie</span>
+          <span class="weather-desc-spacer">&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        </div>
+        <div class="weather-desc-block">
+          <span class="weather-desc-text" id="tvWeatherDesc2">Bezchmurnie</span>
+          <span class="weather-desc-spacer">&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        </div>
       </div>
     </div>
 
