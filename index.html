@@ -16,6 +16,10 @@
       -webkit-user-select: none;
       -webkit-touch-callout: none;
     }
+    input, textarea {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
     body {
       background-color: #000000;
       color: #ffffff;
@@ -258,6 +262,16 @@
       font-size: 16px;
       outline: none;
     }
+    .btn-do-search {
+      background-color: #3A3A3C;
+      color: #00E5FF;
+      border: 1px solid #444444;
+      border-radius: 12px;
+      padding: 0 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
     .search-results-list {
       list-style: none;
       display: flex;
@@ -388,7 +402,8 @@
       <h2>Szukaj miejscowości</h2>
     </div>
     <div class="search-input-group">
-      <input type="text" class="search-input" id="etSearchQuery" placeholder="Wpisz nazwę (np. Szczecin)...">
+      <input type="text" class="search-input" id="etSearchQuery" placeholder="Wpisz nazwę (np. Szczecin)..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button class="btn-do-search" id="btnDoSearch">Szukaj</button>
     </div>
     <ul class="search-results-list" id="rvSearchResults"></ul>
   </div>
@@ -402,10 +417,10 @@
     function updateClock() {
       const now = new Date();
       document.getElementById('tvCurrentTime').innerText = now.toLocaleTimeString('pl-PL', { hour12: false });
-
+      
       const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
       document.getElementById('tvCurrentDate').innerText = now.toLocaleDateString('pl-PL', options);
-
+      
       updateMoonPhase(now);
     }
     setInterval(updateClock, 1000);
@@ -494,7 +509,7 @@
 
     function updateUI(hybrid, gfs) {
       const hourlyList = (hybrid && hybrid.Data) ? hybrid.Data : ((gfs && gfs.Data) ? gfs.Data : []);
-
+      
       // Select valid current item
       const nowMs = Date.now();
       const validItems = hourlyList.filter(item => parseFloat(item.Temperature || 0) > 200.0);
@@ -514,12 +529,12 @@
         const tempC = (parseFloat(currentItem.Temperature) - 273.15).toFixed(1);
         document.getElementById('tvTemperature').innerText = `${tempC}°`;
         document.getElementById('tvHumidity').innerText = `${currentItem.Humidity || '--'}%`;
-
+        
         const pres = Math.round(parseFloat(currentItem.PressureMSL || currentItem.Pressure || 0) / (parseFloat(currentItem.Pressure || 0) > 2000 ? 100 : 1));
         document.getElementById('tvPressure').innerText = `${pres || '--'} hPa`;
-
+        
         document.getElementById('tvWindSpeed').innerText = `${Math.round(parseFloat(currentItem.Wind_Speed || 0))} m/s`;
-
+        
         const windDeg = parseFloat(currentItem.Wind_Dir || 0);
         document.getElementById('ivWindIcon').style.transform = `rotate(${windDeg}deg)`;
 
@@ -587,6 +602,7 @@
     const searchModal = document.getElementById('searchModal');
     const etQuery = document.getElementById('etSearchQuery');
     const rvResults = document.getElementById('rvSearchResults');
+    const btnDoSearch = document.getElementById('btnDoSearch');
 
     document.getElementById('btnOpenSearch').onclick = () => {
       searchModal.classList.add('active');
@@ -604,6 +620,22 @@
         searchTimeout = setTimeout(() => doSearch(query), 400);
       } else {
         rvResults.innerHTML = '';
+      }
+    };
+
+    btnDoSearch.onclick = () => {
+      const query = etQuery.value.trim();
+      if (query.length >= 1) {
+        doSearch(query);
+      }
+    };
+
+    etQuery.onkeydown = (e) => {
+      if (e.key === 'Enter') {
+        const query = etQuery.value.trim();
+        if (query.length >= 1) {
+          doSearch(query);
+        }
       }
     };
 
@@ -641,3 +673,5 @@
   </script>
 </body>
 </html>
+}
+}
