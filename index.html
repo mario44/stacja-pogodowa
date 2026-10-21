@@ -518,7 +518,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Moon Phase Calculator in Polish
+    // Astronomical Moon Phase Calculator in Polish (Northern Hemisphere)
     function updateMoonPhase(date) {
       const year = date.getUTCFullYear();
       let month = date.getUTCMonth() + 1;
@@ -544,14 +544,14 @@
       const illumination = Math.round(((1.0 - Math.cos(phaseAngle)) / 2.0) * 100.0);
 
       let phaseName = "Nów";
-      let moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#333333" stroke="#FFFFFF" stroke-width="1.5"/></svg>';
+      let moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222" stroke="#FFFFFF" stroke-width="1.5"/></svg>';
 
       if (moonAge < 1.84 || moonAge >= 27.69) {
         phaseName = "Nów";
         moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222" stroke="#FFFFFF" stroke-width="1.5"/></svg>';
       } else if (moonAge < 5.53) {
         phaseName = "Sierp przybywający";
-        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222"/><path d="M16 4 A12 12 0 0 1 16 28 A8 12 0 0 0 16 4 Z" fill="#FFFFFF"/></svg>';
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222"/><path d="M16 4 A12 12 0 0 1 16 28 A8 12 0 0 1 16 4 Z" fill="#FFFFFF"/></svg>';
       } else if (moonAge < 9.23) {
         phaseName = "Pierwsza kwadra";
         moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222"/><path d="M16 4 A12 12 0 0 1 16 28 Z" fill="#FFFFFF"/></svg>';
@@ -563,13 +563,13 @@
         moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#FFFFFF"/></svg>';
       } else if (moonAge < 20.30) {
         phaseName = "Księżyc ubywający";
-        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#FFFFFF"/><path d="M16 4 A8 12 0 0 0 16 28 A12 12 0 0 0 16 4 Z" fill="#222222"/></svg>';
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#FFFFFF"/><path d="M16 4 A8 12 0 0 1 16 28 A12 12 0 0 1 16 4 Z" fill="#222222"/></svg>';
       } else if (moonAge < 23.99) {
         phaseName = "Ostatnia kwadra";
         moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222"/><path d="M16 4 A12 12 0 0 0 16 28 Z" fill="#FFFFFF"/></svg>';
       } else {
         phaseName = "Sierp ubywający";
-        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222"/><path d="M16 4 A12 12 0 0 0 16 28 A8 12 0 0 1 16 4 Z" fill="#FFFFFF"/></svg>';
+        moonSvg = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#222222"/><path d="M16 4 A12 12 0 0 0 16 28 A8 12 0 0 0 16 4 Z" fill="#FFFFFF"/></svg>';
       }
 
       document.getElementById('tvMoonPhaseTitle').innerText = phaseName;
@@ -577,50 +577,64 @@
       document.getElementById('ivMoonIcon').innerHTML = moonSvg;
     }
 
-    // Synchronized Dynamic Weather SVG
+    // Precise Dynamic Weather SVG (All IMGW Weather States)
     function getWeatherSvg(iconCode, cloudP) {
       if (!iconCode) return '<svg viewBox="0 0 32 32"><path d="M8 22h16a6 6 0 0 0 0-12 7 7 0 0 0-13.6-1.5A5 5 0 0 0 8 22z" fill="#D1D5DB"/></svg>';
       const code = iconCode.toLowerCase().trim();
-      const match = code.match(/n(\d)z(\d{2})[dn]?/);
+      const match = code.match(/n(\d)z(\d{2})([dn])?/);
 
       if (match) {
         const cloudLevel = parseInt(match[1], 10);
         const phen = match[2];
+        const isNight = match[3] === 'n';
 
-        // Thunderstorm
+        // 1. Burza (Thunderstorm)
         if (['85', '86', '90'].includes(phen)) {
           return '<svg viewBox="0 0 32 32"><path d="M8 18h16a6 6 0 0 0 0-12 7 7 0 0 0-13.6-1.5A5 5 0 0 0 8 18z" fill="#6B7280"/><polygon points="16,19 12,25 15,25 13,29 19,23 16,23" fill="#FBBF24"/></svg>';
         }
-        // Rain
-        if (['60', '61', '63', '66', '68', '70', '71', '73', '76', '80', '83', '84'].includes(phen)) {
+        // 2. Śnieg / Deszcz ze śniegiem (Snow / Sleet)
+        if (['38', '56', '71', '73'].includes(phen)) {
+          return '<svg viewBox="0 0 32 32"><path d="M8 18h16a6 6 0 0 0 0-12 7 7 0 0 0-13.6-1.5A5 5 0 0 0 8 18z" fill="#9CA3AF"/><circle cx="10" cy="24" r="1.5" fill="#FFFFFF"/><circle cx="16" cy="24" r="1.5" fill="#FFFFFF"/><circle cx="22" cy="24" r="1.5" fill="#FFFFFF"/><circle cx="13" cy="28" r="1.5" fill="#FFFFFF"/><circle cx="19" cy="28" r="1.5" fill="#FFFFFF"/></svg>';
+        }
+        // 3. Ulewny deszcz (Heavy rain)
+        if (['76', '80', '83', '84'].includes(phen)) {
+          return '<svg viewBox="0 0 32 32"><path d="M8 18h16a6 6 0 0 0 0-12 7 7 0 0 0-13.6-1.5A5 5 0 0 0 8 18z" fill="#6B7280"/><g stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round"><line x1="10" y1="21" x2="7" y2="28"/><line x1="16" y1="21" x2="13" y2="28"/><line x1="22" y1="21" x2="19" y2="28"/></g></svg>';
+        }
+        // 4. Deszcz (Rain)
+        if (['68', '70'].includes(phen)) {
           return '<svg viewBox="0 0 32 32"><path d="M8 18h16a6 6 0 0 0 0-12 7 7 0 0 0-13.6-1.5A5 5 0 0 0 8 18z" fill="#9CA3AF"/><g stroke="#00E5FF" stroke-width="2" stroke-linecap="round"><line x1="10" y1="21" x2="8" y2="26"/><line x1="16" y1="21" x2="14" y2="26"/><line x1="22" y1="21" x2="20" y2="26"/></g></svg>';
         }
-        // Fog
+        // 5. Słaby deszcz / Mżawka (Light rain)
+        if (['60', '61', '63', '66'].includes(phen)) {
+          return '<svg viewBox="0 0 32 32"><circle cx="11" cy="11" r="5" fill="#FFBE3C"/><path d="M10 20h12a5 5 0 0 0 0-10 6 6 0 0 0-11.7-1.3A4.5 4.5 0 0 0 10 20z" fill="#9CA3AF"/><g stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round"><line x1="11" y1="23" x2="10" y2="26"/><line x1="16" y1="23" x2="15" y2="26"/><line x1="21" y1="23" x2="20" y2="26"/></g></svg>';
+        }
+        // 6. Mgła (Fog)
         if (['45', '49', '50'].includes(phen)) {
-          return '<svg viewBox="0 0 32 32"><g stroke="#E5E7EB" stroke-width="2" stroke-linecap="round"><line x1="6" y1="12" x2="26" y2="12"/><line x1="8" y1="16" x2="24" y2="16"/><line x1="6" y1="20" x2="26" y2="20"/></g></svg>';
+          return '<svg viewBox="0 0 32 32"><g stroke="#E5E7EB" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="12" x2="26" y2="12"/><line x1="8" y1="16" x2="24" y2="16"/><line x1="6" y1="20" x2="26" y2="20"/></g></svg>';
         }
-        // Overcast / Cloudy
+        // 7. Pochmurno / Całkowite zachmurzenie (Overcast)
         if (['08', '09', '10'].includes(phen) || cloudLevel >= 8) {
-          return '<svg viewBox="0 0 32 32"><path d="M8 22h16a6 6 0 0 0 0-12 7 7 0 0 0-13.6-1.5A5 5 0 0 0 8 22z" fill="#D1D5DB"/></svg>';
+          return '<svg viewBox="0 0 32 32"><path d="M6 22h14a5 5 0 0 0 0-10 6 6 0 0 0-11.7-1.3A4.5 4.5 0 0 0 6 22z" fill="#9CA3AF"/><path d="M12 24h14a5 5 0 0 0 0-10 6 6 0 0 0-11.7-1.3A4.5 4.5 0 0 0 12 24z" fill="#D1D5DB"/></svg>';
         }
-        // Scattered Clouds
+        // 8. Zachmurzenie duże (Scattered clouds)
         if (['06', '07'].includes(phen) || (cloudLevel >= 3 && cloudLevel <= 7)) {
-          return '<svg viewBox="0 0 32 32"><path d="M8 22h16a6 6 0 0 0 0-12 7 7 0 0 0-13.6-1.5A5 5 0 0 0 8 22z" fill="#D1D5DB"/></svg>';
+          return '<svg viewBox="0 0 32 32"><circle cx="10" cy="10" r="5" fill="#FFBE3C"/><path d="M8 22h16a6 6 0 0 0 0-12 7 7 0 0 0-13.6-1.5A5 5 0 0 0 8 22z" fill="#D1D5DB"/></svg>';
         }
-        // Few / Partly Cloudy
+        // 9. Zachmurzenie umiarkowane / małe (Partly cloudy)
         if (['04', '05'].includes(phen) || cloudLevel === 1 || cloudLevel === 2) {
-          return '<svg viewBox="0 0 32 32"><circle cx="11" cy="11" r="6" fill="#FFBE3C"/><path d="M10 23h12a5 5 0 0 0 0-10 6 6 0 0 0-11.7-1.3A4.5 4.5 0 0 0 10 23z" fill="#D1D5DB"/></svg>';
+          const sunOrMoon = isNight ? '<circle cx="11" cy="11" r="5" fill="#E5E7EB"/>' : '<circle cx="11" cy="11" r="6" fill="#FFBE3C"/>';
+          return `<svg viewBox="0 0 32 32">${sunOrMoon}<path d="M10 22h12a5 5 0 0 0 0-10 6 6 0 0 0-11.7-1.3A4.5 4.5 0 0 0 10 22z" fill="#D1D5DB"/></svg>`;
         }
-        // Sun
+        // 10. Bezchmurnie (Clear sky)
         if (cloudLevel === 0) {
+          if (isNight) {
+            return '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="8" fill="#222222"/><path d="M16 8 A8 8 0 0 1 24 16 A8 8 0 0 1 16 24 A6 8 0 0 0 16 8 Z" fill="#FFFFFF"/></svg>';
+          }
           return '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="7" fill="#FFBE3C"/><g stroke="#FFBE3C" stroke-width="2" stroke-linecap="round"><line x1="16" y1="3" x2="16" y2="6"/><line x1="16" y1="26" x2="16" y2="29"/><line x1="3" y1="16" x2="6" y2="16"/><line x1="26" y1="16" x2="29" y2="16"/><line x1="6.8" y1="6.8" x2="8.9" y2="8.9"/><line x1="23.1" y1="23.1" x2="25.2" y2="25.2"/><line x1="6.8" y1="25.2" x2="8.9" y2="23.1"/><line x1="23.1" y1="8.9" x2="25.2" y2="6.8"/></g></svg>';
         }
       }
 
-      // Fallback cloud
-      const c = parseInt(cloudP || '0', 10);
-      if (c < 20) return '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="7" fill="#FFBE3C"/><g stroke="#FFBE3C" stroke-width="2" stroke-linecap="round"><line x1="16" y1="3" x2="16" y2="6"/><line x1="16" y1="26" x2="16" y2="29"/><line x1="3" y1="16" x2="6" y2="16"/><line x1="26" y1="16" x2="29" y2="16"/><line x1="6.8" y1="6.8" x2="8.9" y2="8.9"/><line x1="23.1" y1="23.1" x2="25.2" y2="25.2"/><line x1="6.8" y1="25.2" x2="8.9" y2="23.1"/><line x1="23.1" y1="8.9" x2="25.2" y2="6.8"/></g></svg>';
-      if (c < 50) return '<svg viewBox="0 0 32 32"><circle cx="11" cy="11" r="6" fill="#FFBE3C"/><path d="M10 23h12a5 5 0 0 0 0-10 6 6 0 0 0-11.7-1.3A4.5 4.5 0 0 0 10 23z" fill="#D1D5DB"/></svg>';
+      // Fallback
       return '<svg viewBox="0 0 32 32"><path d="M8 22h16a6 6 0 0 0 0-12 7 7 0 0 0-13.6-1.5A5 5 0 0 0 8 22z" fill="#D1D5DB"/></svg>';
     }
 
